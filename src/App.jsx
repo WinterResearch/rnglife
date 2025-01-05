@@ -92,21 +92,46 @@ const App = () => {
 
   const calculateScore = () => {
     setIsRolling(true);
-    let baseScore = 50;
+    let baseScore = 40 + Math.floor(Math.random() * 20); // Base score between 40-60
     let bonus = 0;
+    let multiplier = 1 + (Math.random() * 0.3); // Random multiplier between 1-1.3
     
+    // Count total selections
+    const totalSelections = Object.values(selections).reduce((acc, categorySelections) => 
+      acc + Object.values(categorySelections).filter(Boolean).length, 0
+    );
+    
+    // Calculate bonus based on selections
     Object.entries(selections).forEach(([categoryId, options]) => {
       Object.entries(options).forEach(([optionText, isSelected]) => {
         if (isSelected) {
           const option = categories
             .find(c => c.id === categoryId)
             .options.find(o => o.text === optionText);
-          bonus += option.impact;
+          
+          // Add some randomness to each option's impact
+          const randomImpact = option.impact * (0.8 + Math.random() * 0.4); // ±20% variation
+          bonus += randomImpact;
         }
       });
     });
 
-    let finalScore = Math.min(100, Math.max(1, baseScore + bonus + Math.floor(Math.random() * 20) - 10));
+    // Apply category synergy bonuses
+    if (selections.personality && selections.social) {
+      bonus *= 1.1; // 10% bonus for personality + social combination
+    }
+    
+    // Apply multiplier based on number of selections
+    const selectionMultiplier = 1 + (totalSelections * 0.05); // 5% bonus per selection
+    
+    let finalScore = Math.min(100, Math.max(1, 
+      Math.floor((baseScore + bonus) * multiplier * selectionMultiplier)
+    ));
+    
+    // Add final random variation
+    finalScore = Math.min(100, Math.max(1,
+      finalScore + (Math.floor(Math.random() * 11) - 5) // ±5 points random adjustment
+    ));
     
     setTimeout(() => {
       setScore(finalScore);
@@ -122,11 +147,12 @@ const App = () => {
       }
     }, 2000);
 
-    // Animated counting effect
+    // Animated counting effect with randomized increments
     let current = 0;
     const animate = () => {
       if (current < finalScore) {
-        current += 2;
+        const increment = 1 + Math.floor(Math.random() * 3); // Random increment between 1-3
+        current += increment;
         setScore(Math.min(current, finalScore));
         requestAnimationFrame(animate);
       }
@@ -282,9 +308,9 @@ const App = () => {
 
         <footer className="text-center py-8 opacity-75">
           <p className="text-sm">
-            Spread good vibes ✨ by{' '}
+            Spread good vibes ✨ by{'IvyLeague'}
             <a
-              href="https://github.com/yourusername"
+              href="https://github.com/WinterResearch"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline"
