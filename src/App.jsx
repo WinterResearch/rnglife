@@ -289,7 +289,7 @@ const App = () => {
               rel="noopener noreferrer"
               className="hover:underline"
             >
-              Your Name
+              IvyLeague
             </a>
           </p>
         </footer>
